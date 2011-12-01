@@ -1,0 +1,10 @@
+CMake Toolchain Collection
+--------------------------
+
+This is a collection of CMake toolchains that I developed over the years. Most are targeting mobile phone development platforms. Design goal of all of these are to be minimal invasive to existing build environments. Hence, most toolchain files do not assume additional platform files. In consequence all toolchains are targeting usually a quite specific setup.
+
+
+Contribute!
+-----------
+Please let me know if you found a bug or have a better solution. Use github to fork send patches. Or contact me directly via hartmut@gmail.com
+
