@@ -39,13 +39,16 @@ set_property(CACHE ANDROID_NDK_ARCH PROPERTY STRINGS ${ANDROID_NDK_ARCH_SUPPORTE
 set(ANDROID_NDK_ABI)
 set(ANDROID_NDK_ABI_EXT)
 set(ANDROID_NDK_GCC_PREFIX)
+
+
 set(ANDROID_NDK_ARCH_CFLAGS)
 set(ANDROID_NDK_ARCH_LDFLAGS)
+
 if("${ANDROID_NDK_ARCH}" STREQUAL "arm" )
 	set(ANDROID_NDK_ABI "armeabi")
 	set(ANDROID_NDK_ABI_EXT "arm-linux-androideabi")
 	set(ANDROID_NDK_GCC_PREFIX "arm-linux-androideabi")
-	set(ANDROID_NDK_ARCH_CFLAGS "-mthumb")
+	set(ANDROID_NDK_ARCH_CFLAGS "-D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv5te -mtune=xscale -msoft-float -mthumb")
 endif()	
 if("${ANDROID_NDK_ARCH}" STREQUAL "armv7" )
 	set(ANDROID_NDK_ABI "armeabi-v7a")
@@ -66,6 +69,10 @@ if(ANDROID_NDK_TOOLCHAIN_DEBUG)
 	message(STATUS "ANDROID_NDK_ARCH_CFLAGS - ${ANDROID_NDK_ARCH_CFLAGS}")
 endif()
 
+# global C flags
+set(ANDROID_NDK_GLOBAL_CFLAGS "-fomit-frame-pointer -fno-strict-aliasing -finline-limit=64")
+
+
 # choose NDK STL implementation
 set(ANDROID_NDK_STL_SUPPORTED gnu-libstdc++ stlport)
 set(ANDROID_NDK_STL "gnu-libstdc++" CACHE STRING "Android NDK STL (${ANDROID_NDK_STL_SUPPORTED})")
@@ -74,7 +81,7 @@ set_property(CACHE ANDROID_NDK_STL PROPERTY STRINGS ${ANDROID_NDK_STL_SUPPORTED}
 
 # set the Android Platform
 set(ANDROID_API_SUPPORTED "android-8;android-9;android-14")
-set(ANDROID_API "android-8" CACHE STRING "Android SDK API (${ANDROID_API_SUPPORTED})")
+set(ANDROID_API "android-9" CACHE STRING "Android SDK API (${ANDROID_API_SUPPORTED})")
 set_property(CACHE ANDROID_API PROPERTY STRINGS ${ANDROID_API_SUPPORTED})
 
 # set sysroot - in Android this in function of Android API and architecture
@@ -95,19 +102,23 @@ set(ANDROID_NDK_STL_CXXFLAGS)
 set(ANDROID_NDK_STL_LIBRARYPATH)
 set(ANDROID_NDK_STL_LDFLAGS)
 if ("${ANDROID_NDK_STL}" STREQUAL "stlport") 
-	set(ANDROID_NDK_STL_CXXFLAGS "${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/stlport")
-	set(ANDROID_NDK_STL_LIBRARYPATH "-I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/libs/${ANDROID_NDK_ABI}")
-	set(ANDROID_NDK_STL_LDFLAGS)
-else()
-	set(ANDROID_NDK_STL_CXXFLAGS "-I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/include -I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/libs/${ANDROID_NDK_ABI}/include")
+	set(ANDROID_NDK_STL_CXXFLAGS "-D_STLP_USE_NEWALLOC -I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/stlport -fno-exceptions -fno-rtti")
 	set(ANDROID_NDK_STL_LIBRARYPATH "${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/libs/${ANDROID_NDK_ABI}")
-	set(ANDROID_NDK_STL_LDFLAGS)
+	set(ANDROID_NDK_STL_LDFLAGS "-lstlport_static")
+else()
+	set(ANDROID_NDK_STL_CXXFLAGS "-I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/include -I${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/libs/${ANDROID_NDK_ABI}/include" FORCE)
+	set(ANDROID_NDK_STL_LIBRARYPATH "${ANDROID_NDK_ROOT}/sources/cxx-stl/${ANDROID_NDK_STL}/libs/${ANDROID_NDK_ABI}" FORCE)
+	set(ANDROID_NDK_STL_LDFLAGS " -lsupc++ -lgnustl_static")
 endif()
 
+# global linker flags
 
-# some overrides (see docs/STANDALONE-TOOLCHAIN.html)
-set(CMAKE_C_FLAGS "--sysroot=${ANDROID_NDK_SYSROOT} -DANDROID ${ANDROID_NDK_ARCH_CFLAGS} ${ANDROID_NDK_ARCH_LDFLAGS}" CACHE STRING "C flags" FORCE)
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${ANDROID_NDK_STL_CXXFLAGS} -L${ANDROID_NDK_STL_LIBRARYPATH} -lstdc++ -lsupc++" CACHE STRING "C++ flags" FORCE)
+set(ANDROID_NDK_GLOBAL_LDFLAGS "-Wl,--no-undefined -Wl,-z,noexecstack")
+
+
+# some overrides (see docs/STANDALONE-TOOLCHAIN.html) 
+set(CMAKE_C_FLAGS "${ANDROID_NDK_GLOBAL_CFLAGS} ${ANDROID_NDK_GLOBAL_LDFLAGS} --sysroot=${ANDROID_NDK_SYSROOT} -DANDROID ${ANDROID_NDK_ARCH_CFLAGS} ${ANDROID_NDK_ARCH_LDFLAGS} -nostdlib -llog -landroid -llog -lc -lm" CACHE STRING "C flags" FORCE)
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${ANDROID_NDK_STL_CXXFLAGS} -L${ANDROID_NDK_STL_LIBRARYPATH} -lstdc++ ${ANDROID_NDK_STL_LDFLAGS}" CACHE STRING "C++ flags" FORCE)
 
 
 # specify compiler
