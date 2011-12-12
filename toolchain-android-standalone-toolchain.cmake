@@ -9,7 +9,7 @@
 # need to know where the NDK resides
 set(ANDROID_TOOLCHAIN_ROOT "$ENV{NDK_TOOLCHAIN_ROOT}" CACHE PATH "Android Standalone Toolchain location")
 
-set(ANDROID_NDK_TOOLCHAIN_DEBUG ON)
+#set(ANDROID_NDK_TOOLCHAIN_DEBUG ON)
 
 # basic setup
 set(CMAKE_CROSSCOMPILING 1)
@@ -74,10 +74,12 @@ set(ANDROID_NDK_GCC_VERSION "4.4.3")
 
 # global linker flags
 #  -Wl,-z,noexecstack -Wl,--gc-sections -Wl,-z,nocopyreloc
-set(ANDROID_NDK_GLOBAL_LDFLAGS "-Wl,--no-undefined -Wl,--fix-cortex-a8 ")
+set(ANDROID_NDK_GLOBAL_LDFLAGS "-Wl,--no-undefined -Wl,-z,noexecstack -Wl,--fix-cortex-a8 ")
 
-# linker flags
-set(CMAKE_SHARED_LINKER_FLAGS "-lstdc++ -lc -lm" CACHE STRING "Linker flags" FORCE)
+
+# linker flags (here only one thing missing here is lstdc++ - in Android the actual STL implementation is user dependent!)
+# gnustl_static or the like need to be set in the actual cmake file!
+set(CMAKE_SHARED_LINKER_FLAGS "-lc -lm -ldl -lgcc" CACHE STRING "Linker flags" FORCE)
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "Linker flags" FORCE)
 
 # some overrides (see docs/STANDALONE-TOOLCHAIN.html) 
