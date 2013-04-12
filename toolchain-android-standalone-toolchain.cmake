@@ -62,7 +62,7 @@ set(ANDROID_NDK_GLOBAL_CFLAGS "-DANDROID -fomit-frame-pointer -fno-strict-aliasi
 set(ANDROID_NDK_GLOBAL_CXXFLAGS "-fno-exceptions -fno-rtti")
 
 # set the Android Platform
-set(ANDROID_API_SUPPORTED "android-9;android-14")
+set(ANDROID_API_SUPPORTED "android-8;android-9;android-14")
 set(ANDROID_API "android-9" CACHE STRING "Android SDK API (${ANDROID_API_SUPPORTED})")
 set_property(CACHE ANDROID_API PROPERTY STRINGS ${ANDROID_API_SUPPORTED})
 
