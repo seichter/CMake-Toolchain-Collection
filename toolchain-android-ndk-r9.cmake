@@ -3,11 +3,14 @@
 #
 # (c) Copyrights 2009-2013 Hartmut Seichter
 # 
-# Note: this version only targets NDK r8e
+# Note: this version only targets NDK 9
 #
-# Only tested with using stlport
-
+# Warning: early version:
+# Supported: GCC 4.8 only! STLport or gnu STL, ARM only
+#
 # need to know where the NDK resides
+#
+
 set(ANDROID_NDK_ROOT "$ENV{ANDROID_NDK_ROOT}" CACHE PATH "Android Toolchain location")
 
 set(ANDROID_NDK_TOOLCHAIN_DEBUG ON)
