@@ -20,7 +20,10 @@ set(ANDROID 1)
 
 # set supported architecture
 set(ANDROID_NDK_ARCH_SUPPORTED "arm;armv7;x86")
-set(ANDROID_NDK_ARCH "arm" CACHE STRING "Android NDK CPU architecture (${ANDROID_NDK_ARCH_SUPPORTED})")
+if (NOT ANDROID_NDK_ARCH)
+    set(ENV{NDK_TOOLCHAIN_ROOT} "arm")
+endif()
+set(ANDROID_NDK_ARCH $ENV{ANDROID_NDK_ARCH} CACHE STRING "Android NDK CPU architecture (${ANDROID_NDK_ARCH_SUPPORTED})")
 set_property(CACHE ANDROID_NDK_ARCH PROPERTY STRINGS ${ANDROID_NDK_ARCH_SUPPORTED})
 
 # armeabi / armeabi-v7a / x86
@@ -48,7 +51,7 @@ endif()
 if("${ANDROID_NDK_ARCH}" STREQUAL "x86" )
 	set(ANDROID_NDK_ABI "x86")
 	set(ANDROID_NDK_ABI_EXT "x86")
-	set(ANDROID_NDK_GCC_PREFIX "i686-android-linux")
+	set(ANDROID_NDK_GCC_PREFIX "i686-linux-android")
 endif()
 
 if(ANDROID_NDK_TOOLCHAIN_DEBUG)
